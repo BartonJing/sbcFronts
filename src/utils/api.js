@@ -12,14 +12,14 @@ axios.interceptors.request.use(config => {
 })
 axios.interceptors.response.use(data => {
   if (data.status && data.status === 200) {
-    if (data.data && data.data.status === -12) {
+    if (data.data && data.data.status === '-12') {
       Message.error({message: t('message.sys_request_need_login')})
       // 跳转到登录页面
       // TODO
       router.replace({path: '/login'})
       return
-    } else if (data.data && data.data.status === -11) {
-      Message.error({message: t('message.sys_login_success')})
+    } else if (data.data && data.data.status === '-11') {
+      Message.error(data.data.msg)
     }
   }
   return data.data
@@ -58,7 +58,7 @@ export const postRequest = (url, params) => {
     }],
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + store.state().token
+      'Authorization': 'Bearer ' + store.state.token
     }
   })
 }
@@ -69,7 +69,7 @@ export const uploadFileRequest = (url, params) => {
     data: params,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + store.state().token
+      'Authorization': 'Bearer ' + store.state.token
     }
   })
 }
@@ -87,7 +87,7 @@ export const putRequest = (url, params) => {
     }],
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + store.state().token
+      'Authorization': 'Bearer ' + store.state.token
     }
   })
 }
@@ -97,7 +97,7 @@ export const deleteRequest = (url) => {
     url: `${base}${url}`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + store.state().token
+      'Authorization': 'Bearer ' + store.state.token
     }
   })
 }
@@ -107,7 +107,7 @@ export const getRequest = (url) => {
     url: `${base}${url}`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + store.state().token
+      'Authorization': 'Bearer ' + store.state.token
     }
   })
 }

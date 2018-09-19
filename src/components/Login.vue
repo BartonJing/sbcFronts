@@ -35,15 +35,14 @@ export default {
   },
   methods: {
     doLogin () {
-      // var _this = this
-      // this.$message(this.$t('message.hello'))
-      var test = ''
-      console.log(this.isEmpty(test))
-      this.getRequest('/index', {
+      var ths = this
+      this.postRequest('/auth/login', {
         username: this.form.username,
         password: this.form.password
       }).then(resp => {
-        console.log('aaa')
+        console.log(resp)
+        ths.$store.commit('setToken', resp)
+        console.log(ths.$store.state.token)
       })
     }
   }
