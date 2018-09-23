@@ -35,14 +35,16 @@ export default {
   },
   methods: {
     doLogin () {
-      var ths = this
+      const ths = this
       this.postRequest('/auth/login', {
         username: this.form.username,
         password: this.form.password
       }).then(resp => {
-        console.log(resp)
         ths.$store.commit('setToken', resp)
-        console.log(ths.$store.state.token)
+        if (resp != null && resp.length > 0) {
+          // 跳转到Home页面
+          ths.$router.replace({path: '/home'})
+        }
       })
     }
   }

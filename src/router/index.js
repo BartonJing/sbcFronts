@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import test from '@/components/test'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
+import PermissionView from '@/components/auth/Permission'
 
 Vue.use(Router)
 
@@ -20,7 +21,7 @@ export default new Router({
       component: Login,
       hidden: true
     }, {
-      path: '/Home',
+      path: '/home',
       name: 'Home',
       component: Home,
       hidden: true
@@ -28,6 +29,10 @@ export default new Router({
       path: '/test',
       name: 'test',
       component: test
+    }, {
+      path: '/auth/permission/view',
+      name: 'permission',
+      component: PermissionView
     }
   ]
 })

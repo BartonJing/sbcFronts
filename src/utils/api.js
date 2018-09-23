@@ -20,6 +20,10 @@ axios.interceptors.response.use(data => {
       return
     } else if (data.data && data.data.status === '-11') {
       Message.error(data.data.msg)
+    } else if (data.data && data.data.status === '403') {
+      Message.error(data.data.msg)
+    } else if (data.data && data.data.status === '401') {
+      Message.error(data.data.msg)
     }
   }
   return data.data
@@ -105,6 +109,25 @@ export const getRequest = (url) => {
   return axios({
     method: 'get',
     url: `${base}${url}`,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + store.state.token
+    }
+  })
+}
+
+export const getRequestParams = (url, params) => {
+  var ret = '?'
+  var uri = ''
+  for (let it in params) {
+    ret += encodeURIComponent(it) + '=' + encodeURIComponent(params[it]) + '&'
+  }
+  uri = `${base}${url}` + ret
+  uri = uri.substr(0, uri.length - 1)
+  console.log(uri)
+  return axios({
+    method: 'get',
+    url: uri,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer ' + store.state.token

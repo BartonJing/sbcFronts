@@ -7,7 +7,7 @@ import store from './store'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import i18n from './i18n/i18n'
-import {getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest} from './utils/api'
+import {getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest, getRequestParams} from './utils/api'
 import {isEmpty} from './utils/utils'
 
 Vue.use(ElementUI)
@@ -16,6 +16,7 @@ Vue.prototype.postRequest = postRequest
 Vue.prototype.putRequest = putRequest
 Vue.prototype.deleteRequest = deleteRequest
 Vue.prototype.uploadFileRequest = uploadFileRequest
+Vue.prototype.getRequestParams = getRequestParams
 Vue.prototype.isEmpty = isEmpty
 
 Vue.config.productionTip = false
