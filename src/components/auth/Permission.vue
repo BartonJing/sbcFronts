@@ -101,12 +101,12 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="父级"
-                          prop="parentId"
+                          prop="parentName"
                           :rules="[{ required: true, message: '请选择父级菜单', trigger: 'blur' }]">
-              <el-input v-model="permission.parentId" placeholder="请选择父级菜单" readonly></el-input>
+              <el-input v-model="permission.parentName" placeholder="请选择父级菜单" readonly></el-input>
             </el-form-item>
             <el-form-item label="">
-              <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+              <el-tree :data="permissions" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
             </el-form-item>
           </el-col>
         </el-row>
@@ -136,43 +136,9 @@ export default {
       permission: null,
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'name'
       },
-      data: [{
-        label: '一级 1',
-        children: [{
-          label: '二级 1-1',
-          children: [{
-            label: '三级 1-1-1'
-          }]
-        }]
-      }, {
-        label: '一级 2',
-        children: [{
-          label: '二级 2-1',
-          children: [{
-            label: '三级 2-1-1'
-          }]
-        }, {
-          label: '二级 2-2',
-          children: [{
-            label: '三级 2-2-1'
-          }]
-        }]
-      }, {
-        label: '一级 3',
-        children: [{
-          label: '二级 3-1',
-          children: [{
-            label: '三级 3-1-1'
-          }]
-        }, {
-          label: '二级 3-2',
-          children: [{
-            label: '三级 3-2-1'
-          }]
-        }]
-      }]
+      permissions: []
     }
   },
   mounted () {
@@ -190,7 +156,8 @@ export default {
         url: null,
         path: null,
         orderId: null,
-        parentId: 'aaaa',
+        parentId: null,
+        parentName: null,
         keepAlive: null,
         requireAuth: null
       }
@@ -206,6 +173,12 @@ export default {
         ths.loading = false
       })
     },
+    getAllPermission () {
+      const ths = this
+      this.getRequestParams('/auth/permission/selectAllPermissionToTree').then(resp => {
+        ths.permissions = resp
+      })
+    },
     handleSizeChange (val) {
       this.pageData.pageSize = val
       this.getTableData()
@@ -219,6 +192,7 @@ export default {
       _this.getRequest('/auth/permission/selectById?id=' + row.id).then(resp => {
         if (resp != null) {
           _this.permission = resp
+          _this.getAllPermission()
           _this.dialogSaveVisible = true
         }
       })
@@ -247,10 +221,12 @@ export default {
       })
     },
     openAddDialog () {
+      this.getAllPermission()
       this.dialogSaveVisible = true
     },
     handleNodeClick (data) {
-      console.log(data)
+      this.permission.parentId = data.parentId
+      this.permission.parentName = data.parentName
     },
     closeDialog () {
       this.initPermission()
