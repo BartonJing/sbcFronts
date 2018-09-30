@@ -93,10 +93,24 @@
               <el-input v-model="permission.orderId" placeholder="请填写排序号"></el-input>
             </el-form-item>
             <el-form-item label="keepAlive">
-              <el-input v-model="permission.keepAlive" placeholder="请填写keepAlive"></el-input>
+              <el-select v-model="permission.keepAlive" placeholder="请填写keepAlive" v-if="encodeMap">
+                <el-option
+                  v-for="item in encodeMap.YN"
+                  :key="item.id"
+                  :label="item.encodeName"
+                  :value="item.encode">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="requireAuth">
-              <el-input v-model="permission.requireAuth" placeholder="请填写requireAuth"></el-input>
+              <el-select v-model="permission.requireAuth" placeholder="请填写requireAuth" v-if="encodeMap">
+                <el-option
+                  v-for="item in encodeMap.YN"
+                  :key="item.id"
+                  :label="item.encodeName"
+                  :value="item.encode">
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -106,7 +120,12 @@
               <el-input v-model="permission.parentName" placeholder="请选择父级菜单" readonly></el-input>
             </el-form-item>
             <el-form-item label="">
-              <el-tree :data="permissions" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+              <el-tree ref="permissionTree"
+                       node-key="id"
+                       :data="permissions"
+                       :props="defaultProps"
+                       default-expand-all
+                       @node-click="handleNodeClick"></el-tree>
             </el-form-item>
           </el-col>
         </el-row>
@@ -138,12 +157,14 @@ export default {
         children: 'children',
         label: 'name'
       },
-      permissions: []
+      permissions: [],
+      encodeMap: null
     }
   },
   mounted () {
     this.getTableData()
     this.initPermission()
+    this.getEncode('YN')
   },
   methods: {
     initPermission () {
@@ -175,8 +196,14 @@ export default {
     },
     getAllPermission () {
       const ths = this
-      this.getRequestParams('/auth/permission/selectAllPermissionToTree').then(resp => {
+      this.getRequestParams('/auth/permission/selectAllPermissionToTree?hasRoot=1').then(resp => {
         ths.permissions = resp
+      })
+    },
+    getEncode (kind) {
+      const ths = this
+      this.getRequestParams('/sys/encode/selectByKind?kind=' + kind).then(resp => {
+        ths.encodeMap = resp
       })
     },
     handleSizeChange (val) {
@@ -192,8 +219,13 @@ export default {
       _this.getRequest('/auth/permission/selectById?id=' + row.id).then(resp => {
         if (resp != null) {
           _this.permission = resp
+          _this.permission.requireAuth = _this.permission.requireAuth + ''
+          _this.permission.keepAlive = _this.permission.keepAlive + ''
           _this.getAllPermission()
           _this.dialogSaveVisible = true
+          setTimeout(function () {
+            _this.$set(_this.permission, 'parentName', _this.$refs.permissionTree.getNode(_this.permission.parentId).data.name)
+          }, 500)
         }
       })
     },
@@ -221,12 +253,13 @@ export default {
       })
     },
     openAddDialog () {
+      this.initPermission()
       this.getAllPermission()
       this.dialogSaveVisible = true
     },
     handleNodeClick (data) {
-      this.permission.parentId = data.parentId
-      this.permission.parentName = data.parentName
+      this.permission.parentId = data.id
+      this.$set(this.permission, 'parentName', data.name)
     },
     closeDialog () {
       this.initPermission()
@@ -241,7 +274,7 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            _this.postRequest('/auth/permission/save', _this.permission).then(resp => {
+            _this.postJsonRequest('/auth/permission/save', JSON.stringify(_this.permission)).then(resp => {
               if (resp.status === 0) {
                 _this.$message({
                   type: 'success',

@@ -66,6 +66,17 @@ export const postRequest = (url, params) => {
     }
   })
 }
+export const postJsonRequest = (url, params) => {
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'Authorization': 'Bearer ' + store.state.token
+    }
+  })
+}
 export const uploadFileRequest = (url, params) => {
   return axios({
     method: 'post',
@@ -124,7 +135,6 @@ export const getRequestParams = (url, params) => {
   }
   uri = `${base}${url}` + ret
   uri = uri.substr(0, uri.length - 1)
-  console.log(uri)
   return axios({
     method: 'get',
     url: uri,
