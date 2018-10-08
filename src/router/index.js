@@ -4,6 +4,7 @@ import test from '@/components/test'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
 import PermissionView from '@/components/auth/Permission'
+import RoleView from '@/components/auth/Role'
 
 Vue.use(Router)
 
@@ -33,6 +34,10 @@ export default new Router({
       path: '/auth/permission/view',
       name: 'permission',
       component: PermissionView
+    }, {
+      path: '/auth/role/view',
+      name: 'role',
+      component: RoleView
     }
   ]
 })
