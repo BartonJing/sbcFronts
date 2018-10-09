@@ -45,7 +45,7 @@
       </el-col>
     </el-row>
     <el-dialog
-      title="菜单信息"
+      title="角色信息"
       :visible.sync="dialogSaveVisible">
       <el-form ref="roleForm" :model="role" label-width="80px" v-if="role">
         <el-row>

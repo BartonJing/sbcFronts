@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import i18n from './i18n/i18n'
 import {getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest, getRequestParams, postJsonRequest} from './utils/api'
 import {isEmpty} from './utils/utils'
+import './utils/filter_utils'
 
 Vue.use(ElementUI)
 Vue.prototype.getRequest = getRequest
