@@ -19,7 +19,6 @@ Vue.filter('formatDateTime', function formatDateTime (value) {
  * 编码转换
  */
 Vue.filter('formatEncode', function formatEncode (value, map, kind) {
-  console.log(value)
   if (map === null || kind === null || value === null) {
     return ''
   }

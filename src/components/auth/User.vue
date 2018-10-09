@@ -129,14 +129,13 @@
       :visible.sync="dialogUserRoleVisible">
       <el-row>
         <el-col :span="24">
-          <el-select v-model="userRoles" multiple placeholder="请选择">
-            <el-option
-              v-for="item in roles"
-              :key="item.id"
-              :label="item.roleName"
-              :value="item.id">
-            </el-option>
-          </el-select>
+          <el-tree ref="roleTree"
+            :data="roles"
+            show-checkbox
+            node-key="id"
+            :props="rolesProps"
+            default-expand-all>
+          </el-tree>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -210,6 +209,10 @@ export default {
         children: 'children',
         label: 'name',
         disabled: true
+      },
+      rolesProps: {
+        children: 'children',
+        label: 'roleName'
       }
     }
   },
@@ -218,6 +221,7 @@ export default {
     this.initUser()
     this.getAllPermission()
     this.getEncode('YN')
+    this.selectAllRoles()
   },
   methods: {
     initUser () {
@@ -257,6 +261,14 @@ export default {
         if (resp.status === 0) {
           _this.user = resp.data
           _this.dialogSaveVisible = true
+        }
+      })
+    },
+    selectAllRoles () {
+      const _this = this
+      _this.getRequest('/auth/role/selectAllRoles').then(resp => {
+        if (resp !== null) {
+          _this.roles = resp
         }
       })
     },
@@ -348,6 +360,9 @@ export default {
       _this.currentRow = row
       _this.getRequest('/auth/role/selectRolesByUserId?userId=' + row.id).then(resp => {
         if (resp != null) {
+          setTimeout(function () {
+            _this.$refs.roleTree.setCheckedKeys([])
+          }, 5)
           _this.userRoles = []
           _this.dialogUserRoleVisible = true
           // 设置选中项
@@ -356,8 +371,13 @@ export default {
               _this.userRoles.push(resp[i].id)
             }
           }
+          setTimeout(function () {
+            _this.$refs.roleTree.setCheckedKeys(_this.userRoles)
+          }, 5)
         } else {
-          _this.userRoles = []
+          setTimeout(function () {
+            _this.$refs.roleTree.setCheckedKeys([])
+          }, 5)
         }
       })
     },
@@ -368,7 +388,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        _this.postRequest('/auth/role/saveUserRoles', {roles: _this.userRoles, userId: _this.currentRow.id}).then(resp => {
+        var selectData = _this.$refs.roleTree.getCheckedKeys()
+        _this.postRequest('/auth/user/saveUserRoles', {roles: selectData, userId: _this.currentRow.id}).then(resp => {
           if (resp.status === 0) {
             _this.$message({
               type: 'success',
@@ -386,13 +407,13 @@ export default {
     },
     selectUserPermissions (row) {
       const _this = this
-      _this.getRequest('/auth/permission/selectRolesByUserId?userId=' + row.id).then(resp => {
+      _this.getRequest('/auth/permission/selectUserPermissions?userId=' + row.id).then(resp => {
         if (resp != null) {
+          _this.userPermissions = []
+          _this.dialogUserPermissionVisible = true
           setTimeout(function () {
             _this.$refs.userPermissionTree.setCheckedKeys([])
           }, 50)
-          _this.userPermissions = []
-          _this.dialogRolePermissionVisible = true
           // 设置选中项
           if (resp != null && resp.length > 0) {
             for (let i = 0; i < resp.length; i++) {
