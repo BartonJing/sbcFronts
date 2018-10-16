@@ -20,19 +20,13 @@
               <i class="el-icon-menu" @click="isCollapseHander"></i>
             </el-col>
             <el-col :span="6">
+              <el-button class="iconfont bt-Ztubiao">评论</el-button>
               <el-badge :value="12">
-                <el-button size="small">评论</el-button>
+                <el-button size="small" icon="iconfont peiwangyindao">评论</el-button>
               </el-badge>
             </el-col>
             <el-col :span="6">
-              <el-dropdown>
-                <i class="el-icon-setting" style="margin-right: 15px"></i>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>设置</el-dropdown-item>
-                  <el-dropdown-item>退出登录</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-              <span>{{user.name}}</span>
+              <el-button size="small" @click="logout">退出</el-button>
             </el-col>
           </el-row>
         </el-header>
@@ -124,6 +118,11 @@ export default {
       setTimeout(function () {
         vm.initSuccess = true
       }, 500)
+    },
+    logout () {
+      this.$store.commit('setToken', null)
+      this.$store.commit('setUser', null)
+      this.$router.replace({path: '/login'})
     }
   },
   computed: {

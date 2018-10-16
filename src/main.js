@@ -10,6 +10,7 @@ import i18n from './i18n/i18n'
 import {getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest, getRequestParams, postJsonRequest} from './utils/api'
 import {isEmpty} from './utils/utils'
 import './utils/filter_utils'
+import './assets/icon/iconfont.css'
 
 Vue.use(ElementUI)
 Vue.prototype.getRequest = getRequest
@@ -31,10 +32,4 @@ new Vue({
   i18n,
   components: { App },
   template: '<App/>'
-})
-
-router.beforeEach((to, from, next) => {
-  console.log(to)
-  console.log(from)
-  next()
 })
