@@ -3,19 +3,16 @@ import Router from 'vue-router'
 import test from '@/components/test'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
-import PermissionView from '@/components/auth/Permission'
-import RoleView from '@/components/auth/Role'
-import UserView from '@/components/auth/User'
 
 Vue.use(Router)
-
 export default new Router({
   routes: [
     {
       path: '/',
       name: '登录',
       component: Login,
-      hidden: true
+      hidden: true,
+      children: []
     },
     {
       path: '/login',
@@ -26,12 +23,14 @@ export default new Router({
       path: '/home',
       name: 'Home',
       component: Home,
-      hidden: true
+      hidden: true,
+      children: []
     }, {
       path: '/test',
       name: 'test',
       component: test
-    }, {
+    }
+    /* {path: '*', redirect: '/Home'} *//* {
       path: '/auth/permission/view',
       name: 'permission',
       component: PermissionView
@@ -43,6 +42,6 @@ export default new Router({
       path: '/auth/user/view',
       name: 'user',
       component: UserView
-    }
+    } */
   ]
 })

@@ -34,16 +34,19 @@ export default {
     }
   },
   methods: {
-    doLogin () {
+    doLogin: function () {
       const ths = this
       this.postRequest('/auth/login', {
         username: this.form.username,
         password: this.form.password
       }).then(resp => {
-        ths.$store.commit('setToken', resp)
-        if (resp != null && resp.length > 0) {
-          // 跳转到Home页面
-          ths.$router.replace({path: '/home'})
+        if (resp.status === undefined) {
+          ths.$store.commit('setToken', resp.token)
+          ths.$store.commit('setUser', resp.authUser.principal)
+          if (resp.token != null && resp.token.length > 0) {
+            // 跳转到Home页面
+            ths.$router.replace({path: '/home'})
+          }
         }
       })
     }

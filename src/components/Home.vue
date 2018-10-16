@@ -2,47 +2,14 @@
   <div>
     <el-container class="home-container">
       <el-aside :class="isCollapse?'menu-collapsed':'menu-expanded'">
-        <!--<div v-for="(item,index) in this.routes" :key="index">
-          <a v-bind:href="'/#'+item.path">{{item.name}}</a>
-          <el-button @click="clickListener(item)">{{item.name}}</el-button>
-        </div>-->
         <el-menu
-          default-active="2"
           class="el-menu-vertical-demo"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"
-          :collapse="isCollapse">
-          <el-submenu index="1">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>导航一</span>
-            </template>
-            <el-menu-item-group>
-              <template slot="title">分组一</template>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="分组2">
-              <el-menu-item index="1-3">选项3</el-menu-item>
-            </el-menu-item-group>
-            <el-submenu index="1-4">
-              <template slot="title">选项4</template>
-              <el-menu-item index="1-4-1">选项1</el-menu-item>
-            </el-submenu>
-          </el-submenu>
-          <el-menu-item index="2">
-            <i class="el-icon-menu"></i>
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="3" disabled>
-            <i class="el-icon-document"></i>
-            <span slot="title">导航三</span>
-          </el-menu-item>
-          <el-menu-item index="4">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
-          </el-menu-item>
+          :collapse="isCollapse"
+          @select="handleSelect">
+          <NavMenu :navMenus="routes[2].children" v-if="initSuccess"></NavMenu>
         </el-menu>
       </el-aside>
 
@@ -65,30 +32,19 @@
                   <el-dropdown-item>退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
-              <span>王小虎</span>
+              <span>{{user.name}}</span>
             </el-col>
           </el-row>
         </el-header>
-
-        <!--<el-main>
-          <el-table :data="tableData">
-            <el-table-column prop="date" label="日期" width="140">
-            </el-table-column>
-            <el-table-column prop="name" label="姓名" width="120">
-            </el-table-column>
-            <el-table-column prop="address" label="地址">
-            </el-table-column>
-          </el-table>
-        </el-main>-->
         <el-main>
           <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item v-text="this.$router.currentRoute.name"></el-breadcrumb-item>
           </el-breadcrumb>
-          <keep-alive>
-            <router-view v-if="this.$route.meta.keepAlive"></router-view>
-          </keep-alive>
-          <router-view v-if="!this.$route.meta.keepAlive"></router-view>
+          <!--<keep-alive>
+            <router-view v-if="aa"></router-view>
+          </keep-alive>-->
+          <router-view></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -96,19 +52,22 @@
 </template>
 
 <script>
+import NavMenu from './common/NavMenu'
 export default {
   name: 'HOME',
+  components: {NavMenu},
   data () {
-    const item = {
-      date: '2016-05-02',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1518 弄'
-    }
     return {
       isCollapse: false,
-      list: ['1', '2', '3'],
-      tableData: Array(20).fill(item)
+      initSuccess: false,
+      aa: true
     }
+  },
+  mounted () {
+    this.initMenu()
+  },
+  created () {
+    this.initSlot()
   },
   methods: {
     clickListener (item) {
@@ -116,11 +75,63 @@ export default {
     },
     isCollapseHander () {
       this.isCollapse = !this.isCollapse
+    },
+    initMenu: function () {
+      const _this = this
+      if (_this.$store.state.user === null || _this.$store.state.user.token === null || _this.$store.state.user.token === '') {
+        _this.$router.replace({path: '/login'})
+      }
+      if (_this.$store.state.routes.length > 0) {
+        return
+      }
+      _this.getRequest('/auth/permission/selectUserPermissionsTree?userId=' + _this.user.id).then(resp => {
+        if (resp !== null) {
+          var fmtRoutes = _this.formatRoutes(resp)
+          _this.$router.options.routes[2].children = fmtRoutes
+          _this.$router.addRoutes(fmtRoutes)
+          _this.$store.commit('initMenu', fmtRoutes)
+        }
+      })
+      // initMenu
+    },
+    formatRoutes (routes) {
+      const _this = this
+      let fmRoutes = []
+      routes.forEach(router => {
+        if (router.children && router.children instanceof Array) {
+          router.children = _this.formatRoutes(router.children)
+        }
+        let fmRouter = {
+          id: router.id,
+          path: router.path,
+          component (resolve) {
+            require(['../components' + router.component + '.vue'], resolve)
+          },
+          name: router.name,
+          iconCls: router.icon,
+          meta: null,
+          children: router.children
+        }
+        fmRoutes.push(fmRouter)
+      })
+      return fmRoutes
+    },
+    handleSelect (value, keyPath) {
+      this.$router.push({path: value})
+    },
+    initSlot () {
+      let vm = this
+      setTimeout(function () {
+        vm.initSuccess = true
+      }, 500)
     }
   },
   computed: {
     routes () {
       return this.$router.options.routes
+    },
+    user () {
+      return this.$store.state.user
     }
   }
 }
